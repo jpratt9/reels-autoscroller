@@ -1,0 +1,58 @@
+name: publish
+
+on:
+  push:
+    branches: [master]
+    paths: [manifest.json]
+
+concurrency: publish
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      shipped: ${{ steps.v.outputs.shipped }}
+      configured: ${{ steps.v.outputs.configured }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: v
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SA_KEY: ${{ secrets.CWS_SA_KEY }}
+        run: |
+          v=$(jq -r .version manifest.json)
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          gh release view "v$v" >/dev/null 2>&1 && echo "shipped=true" >> "$GITHUB_OUTPUT" || true
+          # Skip publishing until the Chrome Web Store secrets are configured.
+          [ -n "$SA_KEY" ] && echo "configured=true" >> "$GITHUB_OUTPUT" || true
+
+  publish:
+    needs: check
+    if: needs.check.outputs.shipped != 'true' && needs.check.outputs.configured == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: npm test && npm run package
+      - id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.CWS_SA_KEY }}
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/chromewebstore
+      - env:
+          AUTH: "Authorization: Bearer ${{ steps.auth.outputs.access_token }}"
+          ITEM: publishers/${{ secrets.CWS_PUBLISHER_ID }}/items/${{ secrets.CWS_EXTENSION_ID }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          API=https://chromewebstore.googleapis.com
+          state=$(curl -sS -H "$AUTH" -X POST -T reels-autoscroller.zip "$API/upload/v2/$ITEM:upload" | tee /dev/stderr | jq -r .uploadState)
+          while [ "$state" = IN_PROGRESS ]; do sleep 5; state=$(curl -sS -H "$AUTH" "$API/v2/$ITEM:fetchStatus" | jq -r .lastAsyncUploadState); done
+          [ "$state" = SUCCEEDED ]
+          curl -sS --fail-with-body -H "$AUTH" --json '{}' "$API/v2/$ITEM:publish"
+          gh release create "v${{ needs.check.outputs.version }}" reels-autoscroller.zip --target "$GITHUB_SHA" --generate-notes

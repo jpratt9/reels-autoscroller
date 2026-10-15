@@ -20,18 +20,18 @@
 
 [data-theme="light"] {
   color-scheme: light;
-  --bg: #f5f1eb;
-  --tile: #ece7df;
-  --tile-hover: #e3ddd3;
-  --sunken: #efeae2;
-  --border: #d7d0c5;
-  --divider: #e2dbd1;
-  --text: #1c1916;
-  --text-dim: #38332d;
-  --label: #6b655d;
-  --foot: #8a847b;
-  --accent: #2ba23c;
-  --danger: #c0392b;
+  --bg: #ffffff;
+  --tile: #f2f3f5;
+  --tile-hover: #e8eaed;
+  --sunken: #f7f8fa;
+  --border: #e4e6ea;
+  --divider: #ededf1;
+  --text: #14161a;
+  --text-dim: #3a3f47;
+  --label: #697079;
+  --foot: #9aa0a8;
+  --accent: #16a63b;
+  --danger: #d8382d;
 }
 
 * { box-sizing: border-box; }

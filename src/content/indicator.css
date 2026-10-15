@@ -33,12 +33,13 @@
 }
 
 #ras-indicator[data-theme="light"] {
-  --ras-surface: #f5f1eb;
-  --ras-tile: #ece7df;
-  --ras-border: #d7d0c5;
-  --ras-text: #1c1916;
-  --ras-label: #6b655d;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+  --ras-accent: #16a63b;
+  --ras-surface: #ffffff;
+  --ras-tile: #f2f3f5;
+  --ras-border: #e4e6ea;
+  --ras-text: #14161a;
+  --ras-label: #697079;
+  box-shadow: 0 8px 24px rgba(20, 22, 26, 0.14);
 }
 
 #ras-indicator.ras-dragging { cursor: grabbing; border-color: var(--ras-accent); }
@@ -110,5 +111,5 @@
   pointer-events: none;
   transition: opacity 0.16s ease, transform 0.16s ease;
 }
-#ras-speed-toast[data-theme="light"] { background: #f5f1eb; color: #1c1916; border-color: #d7d0c5; }
+#ras-speed-toast[data-theme="light"] { background: #ffffff; color: #14161a; border-color: #e4e6ea; }
 #ras-speed-toast.ras-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
