@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Reels AutoScroller",
+  "version": "1.0.1",
+  "description": "Hands-free auto-scroll through Instagram Reels, YouTube Shorts, TikTok, and Facebook Reels. 100% local, no tracking.",
+  "permissions": ["storage", "tabs"],
+  "host_permissions": [
+    "https://*.instagram.com/*",
+    "https://*.youtube.com/*",
+    "https://*.tiktok.com/*",
+    "https://*.facebook.com/*"
+  ],
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "Reels AutoScroller",
+    "default_icon": { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
+  },
+  "icons": { "16": "icons/icon16.png", "32": "icons/icon32.png", "48": "icons/icon48.png", "128": "icons/icon128.png" },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.instagram.com/*",
+        "https://*.youtube.com/*",
+        "https://*.tiktok.com/*",
+        "https://*.facebook.com/*"
+      ],
+      "js": [
+        "src/shared/constants.js",
+        "src/shared/utils.js",
+        "src/content/platform.js",
+        "src/content/ui.js",
+        "src/content/autoscroller.js"
+      ],
+      "css": ["src/content/indicator.css"],
+      "run_at": "document_end"
+    }
+  ]
+}

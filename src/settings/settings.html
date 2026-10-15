@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reels AutoScroller — Settings</title>
+    <link rel="stylesheet" href="settings.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>Settings</h1>
+      <button id="close-btn" class="close-btn" title="Close" aria-label="Close">&times;</button>
+    </header>
+
+    <main class="container">
+      <!-- General -->
+      <section class="card">
+        <div class="card-head">
+          <h2>General</h2>
+          <p>Customize the core behavior of Reels AutoScroller.</p>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="row-info">
+              <label for="auto-enable">Auto-Enable on Supported Pages</label>
+              <p>Automatically start scrolling when you open a supported platform.</p>
+            </div>
+            <span class="switch"><input type="checkbox" id="auto-enable" /><span class="switch-track"></span></span>
+          </div>
+          <div class="row">
+            <div class="row-info">
+              <label for="pause-on-comments">Pause When Comments Are Open</label>
+              <p>Temporarily pause auto-scroll while a comments panel is visible.</p>
+            </div>
+            <span class="switch"><input type="checkbox" id="pause-on-comments" /><span class="switch-track"></span></span>
+          </div>
+          <div class="row">
+            <div class="row-info">
+              <label for="theme-preference">Theme</label>
+              <p>Choose light, dark, or follow your system.</p>
+            </div>
+            <select id="theme-preference" class="select">
+              <option value="auto">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+          <div class="row">
+            <div class="row-info">
+              <label for="accent-color">Accent Color</label>
+              <p>The primary accent used across the extension.</p>
+            </div>
+            <input type="color" id="accent-color" value="#39d353" class="color" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Keyboard Shortcuts -->
+      <section class="card">
+        <div class="card-head">
+          <h2>Keyboard Shortcuts</h2>
+          <p>Control the extension from the keyboard on any supported page.</p>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="row-info">
+              <label for="keyboard-shortcuts">Enable Shortcuts</label>
+              <p>Turn all keyboard shortcuts on or off.</p>
+            </div>
+            <span class="switch"><input type="checkbox" id="keyboard-shortcuts" /><span class="switch-track"></span></span>
+          </div>
+
+          <div class="shortcut" data-key="keyboardShortcut" data-display="shortcut-display" data-default="Alt+T">
+            <div class="shortcut-head">
+              <span class="shortcut-title">Toggle Auto Scroll</span>
+              <code id="shortcut-display" class="kbd">Alt + T</code>
+            </div>
+            <p class="shortcut-desc">Start or stop automatic scrolling.</p>
+            <div class="shortcut-actions">
+              <button class="btn btn-secondary btn-sm shortcut-edit">Change</button>
+              <button class="btn btn-ghost btn-sm shortcut-reset">Reset</button>
+            </div>
+          </div>
+          <p id="shortcut-hint" class="shortcut-hint">Assign any key or combination to control Reels AutoScroller.</p>
+
+          <div class="shortcut" data-key="speedUpShortcut" data-display="speed-up-display" data-default="Alt+.">
+            <div class="shortcut-head">
+              <span class="shortcut-title">Speed Up</span>
+              <code id="speed-up-display" class="kbd">Alt + .</code>
+            </div>
+            <p class="shortcut-desc">Increase playback speed by 0.1×.</p>
+            <div class="shortcut-actions">
+              <button class="btn btn-secondary btn-sm shortcut-edit">Change</button>
+              <button class="btn btn-ghost btn-sm shortcut-reset">Reset</button>
+            </div>
+          </div>
+
+          <div class="shortcut" data-key="speedDownShortcut" data-display="speed-down-display" data-default="Alt+,">
+            <div class="shortcut-head">
+              <span class="shortcut-title">Speed Down</span>
+              <code id="speed-down-display" class="kbd">Alt + ,</code>
+            </div>
+            <p class="shortcut-desc">Decrease playback speed by 0.1×.</p>
+            <div class="shortcut-actions">
+              <button class="btn btn-secondary btn-sm shortcut-edit">Change</button>
+              <button class="btn btn-ghost btn-sm shortcut-reset">Reset</button>
+            </div>
+          </div>
+
+          <div class="shortcut" data-key="resetSpeedShortcut" data-display="reset-speed-display" data-default="Alt+R">
+            <div class="shortcut-head">
+              <span class="shortcut-title">Reset Speed</span>
+              <code id="reset-speed-display" class="kbd">Alt + R</code>
+            </div>
+            <p class="shortcut-desc">Return playback speed to 1.0×.</p>
+            <div class="shortcut-actions">
+              <button class="btn btn-secondary btn-sm shortcut-edit">Change</button>
+              <button class="btn btn-ghost btn-sm shortcut-reset">Reset</button>
+            </div>
+          </div>
+
+          <div class="shortcut" data-key="pauseShortcut" data-display="pause-display" data-default="Alt+P">
+            <div class="shortcut-head">
+              <span class="shortcut-title">Pause / Resume</span>
+              <code id="pause-display" class="kbd">Alt + P</code>
+            </div>
+            <p class="shortcut-desc">Pause or resume auto-scroll instantly.</p>
+            <div class="shortcut-actions">
+              <button class="btn btn-secondary btn-sm shortcut-edit">Change</button>
+              <button class="btn btn-ghost btn-sm shortcut-reset">Reset</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Status Indicator -->
+      <section class="card">
+        <div class="card-head">
+          <h2>Status Indicator</h2>
+          <p>Customize the on-screen status display.</p>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="row-info">
+              <label for="show-status-indicator">Show Indicator</label>
+              <p>Display the status indicator on supported pages.</p>
+            </div>
+            <span class="switch"><input type="checkbox" id="show-status-indicator" /><span class="switch-track"></span></span>
+          </div>
+          <div class="row">
+            <div class="row-info">
+              <label for="show-video-time">Show Video Time</label>
+              <p>Display the current time and duration.</p>
+            </div>
+            <span class="switch"><input type="checkbox" id="show-video-time" /><span class="switch-track"></span></span>
+          </div>
+          <div class="row">
+            <div class="row-info">
+              <label for="show-progress-bar">Show Progress Bar</label>
+              <p>Display a seekable progress bar.</p>
+            </div>
+            <span class="switch"><input type="checkbox" id="show-progress-bar" /><span class="switch-track"></span></span>
+          </div>
+          <div class="row">
+            <div class="row-info">
+              <label for="indicator-opacity">Opacity</label>
+              <p>Adjust transparency: <span id="opacity-value">90%</span></p>
+            </div>
+            <input type="range" id="indicator-opacity" min="0.2" max="1" step="0.01" value="0.9" class="slider" />
+          </div>
+          <div class="row">
+            <div class="row-info">
+              <label>Position</label>
+              <p>Where the indicator appears on each platform.</p>
+            </div>
+            <button id="toggle-positions" class="btn btn-secondary btn-sm">Configure</button>
+          </div>
+          <div id="positions-panel" class="positions-panel hidden">
+            <div class="preset-row">
+              <label>Instagram</label>
+              <select class="select preset-select" data-platform="instagram"></select>
+            </div>
+            <div class="preset-row">
+              <label>YouTube</label>
+              <select class="select preset-select" data-platform="youtube"></select>
+            </div>
+            <div class="preset-row">
+              <label>TikTok</label>
+              <select class="select preset-select" data-platform="tiktok"></select>
+            </div>
+            <div class="preset-row">
+              <label>Facebook</label>
+              <select class="select preset-select" data-platform="facebook"></select>
+            </div>
+            <button id="reset-positions" class="btn btn-secondary btn-sm full">Reset All Positions</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Statistics -->
+      <section class="card">
+        <div class="card-head">
+          <h2>Statistics</h2>
+          <p>Your auto-scroll usage.</p>
+        </div>
+        <div class="card-body">
+          <div class="stat-highlight">
+            <div id="total-scrolls" class="stat-value">0</div>
+            <div class="stat-label">Total Scrolls</div>
+          </div>
+          <div class="stat-row"><span>Instagram</span><span id="instagram-scrolls">0</span></div>
+          <div class="stat-row"><span>YouTube</span><span id="youtube-scrolls">0</span></div>
+          <div class="stat-row"><span>TikTok</span><span id="tiktok-scrolls">0</span></div>
+          <div class="stat-row"><span>Facebook</span><span id="facebook-scrolls">0</span></div>
+          <button id="reset-stats" class="btn btn-secondary">Reset Statistics</button>
+        </div>
+      </section>
+
+      <!-- Data -->
+      <section class="card">
+        <div class="card-head">
+          <h2>Data Management</h2>
+          <p>Export or import your settings and statistics.</p>
+        </div>
+        <div class="card-body">
+          <div class="btn-group">
+            <button id="export-settings" class="btn btn-secondary">Export Data</button>
+            <button id="import-settings" class="btn btn-secondary">Import Data</button>
+            <input type="file" id="import-file" accept="application/json" class="hidden" />
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer"><span id="settings-version"></span></footer>
+
+    <div id="shortcut-overlay" class="overlay hidden">
+      <div class="dialog">
+        <p id="overlay-text">Press your new shortcut…</p>
+        <p class="dialog-hint">Press Esc to cancel</p>
+        <button id="shortcut-cancel" class="btn btn-ghost">Cancel</button>
+      </div>
+    </div>
+
+    <script src="../shared/constants.js"></script>
+    <script src="../shared/utils.js"></script>
+    <script src="settings.js"></script>
+  </body>
+</html>
