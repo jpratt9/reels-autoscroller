@@ -1,10 +1,12 @@
 // Popup controller. Talks to the active tab's content script to toggle and pause
-// auto-scroll, and persists speed / auto-enable / theme to chrome.storage.local.
+// auto-scroll, and persists speed / auto-enable to chrome.storage.local.
 
-const ICON_SUN =
-  '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
-const ICON_MOON =
-  '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+const svg = (body, opts = '') =>
+  `<svg viewBox="0 0 24 24" ${opts || 'fill="currentColor"'} stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
+const ICON_DOWN = svg('<polyline points="5 8 12 14 19 8"/><polyline points="5 13 12 19 19 13"/>', 'fill="none" stroke="currentColor" stroke-width="2.2"');
+const ICON_STOP = svg('<rect x="6.5" y="6.5" width="11" height="11" rx="2"/>');
+const ICON_PAUSE = svg('<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>');
+const ICON_PLAY = svg('<path d="M8 5v14l11-7z"/>');
 
 const PLATFORM_MATCHES = [
   'https://*.instagram.com/*',
@@ -25,17 +27,22 @@ const PLATFORM_MATCHES = [
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
-  const toggleBtn = document.getElementById('toggle-btn');
-  const pauseBtn = document.getElementById('pause-btn');
-  const platformStatus = document.getElementById('platform-status');
   const statusEl = document.getElementById('status');
-  const themeToggle = document.getElementById('theme-toggle');
-  const settingsBtn = document.getElementById('settings-btn');
-  const settingsLink = document.getElementById('settings-link');
+  const platformStatus = document.getElementById('platform-status');
+  const toggleBtn = document.getElementById('toggle-btn');
+  const toggleIco = document.getElementById('toggle-ico');
+  const toggleLbl = document.getElementById('toggle-lbl');
+  const pauseBtn = document.getElementById('pause-btn');
+  const pauseIco = document.getElementById('pause-ico');
+  const pauseLbl = document.getElementById('pause-lbl');
   const speedSlider = document.getElementById('playback-speed');
-  const speedInput = document.getElementById('playback-speed-input');
+  const speedVal = document.getElementById('speed-val');
   const autoEnableToggle = document.getElementById('auto-enable-toggle');
   const versionText = document.getElementById('version-text');
+  const settingsLink = document.getElementById('settings-link');
+
+  toggleIco.innerHTML = ICON_DOWN;
+  pauseIco.innerHTML = ICON_PAUSE;
 
   const openSettings = () => chrome.tabs.create({ url: chrome.runtime.getURL('src/settings/settings.html') });
 
@@ -53,43 +60,47 @@ document.addEventListener('DOMContentLoaded', () => {
     return { response, platform };
   };
 
-  const setInactive = (platform) => {
-    platformStatus.textContent = `${PLATFORM_NAMES[platform]} – Inactive`;
-    toggleBtn.disabled = false;
-    toggleBtn.textContent = 'Enable Auto Scroll';
-    toggleBtn.className = 'btn btn-primary';
-    updatePauseButton(false, false);
+  const setToggle = (enabled, disabled) => {
+    toggleBtn.disabled = disabled;
+    toggleBtn.classList.toggle('on', enabled);
+    toggleIco.innerHTML = enabled ? ICON_STOP : ICON_DOWN;
+    toggleLbl.textContent = enabled ? 'Disable Auto Scroll' : 'Enable Auto Scroll';
+  };
+
+  const setPause = (enabled, paused) => {
+    pauseBtn.classList.toggle('hidden', !enabled);
+    pauseBtn.disabled = !enabled;
+    pauseIco.innerHTML = enabled && paused ? ICON_PLAY : ICON_PAUSE;
+    pauseLbl.textContent = enabled && paused ? 'Resume Auto Scroll' : 'Pause Auto Scroll';
   };
 
   const handleUnsupported = () => {
     platformStatus.textContent = 'Unsupported platform';
     statusEl.classList.remove('active');
-    toggleBtn.disabled = true;
-    updatePauseButton(false, false);
+    setToggle(false, true);
+    setPause(false, false);
+  };
+
+  const setInactive = (platform) => {
+    platformStatus.textContent = `${PLATFORM_NAMES[platform]} — Inactive`;
+    statusEl.classList.remove('active');
+    setToggle(false, false);
+    setPause(false, false);
   };
 
   const updateUI = (enabled, paused, platform) => {
-    toggleBtn.textContent = enabled ? 'Disable Auto Scroll' : 'Enable Auto Scroll';
-    toggleBtn.className = enabled ? 'btn btn-success' : 'btn btn-primary';
     statusEl.classList.toggle('active', enabled);
     const label = !enabled ? 'Inactive' : paused ? 'Paused' : 'Active';
-    platformStatus.textContent = `${PLATFORM_NAMES[platform]} – ${label}`;
-    updatePauseButton(enabled, paused);
+    platformStatus.textContent = `${PLATFORM_NAMES[platform]} — ${label}`;
+    setToggle(enabled, false);
+    setPause(enabled, paused);
   };
-
-  function updatePauseButton(enabled, paused) {
-    pauseBtn.classList.toggle('hidden', !enabled);
-    pauseBtn.disabled = !enabled;
-    pauseBtn.textContent = enabled && paused ? 'Resume Auto Scroll' : 'Pause Auto Scroll';
-    pauseBtn.setAttribute('aria-pressed', enabled && paused ? 'true' : 'false');
-  }
 
   const loadState = async (platform) => {
     try {
       const { response } = await sendToActiveTab({ action: 'getStatus' });
       if (!response) return setInactive(platform);
       updateUI(response.enabled, Boolean(response.paused), platform);
-      toggleBtn.disabled = false;
     } catch (error) {
       if (error?.message === 'UNSUPPORTED_PLATFORM') handleUnsupported();
       else setInactive(platform); // content script not injected yet
@@ -110,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
     pauseBtn.disabled = true;
     try {
       const { response, platform } = await sendToActiveTab({ action: 'togglePause' });
-      pauseBtn.disabled = false;
       if (response) updateUI(response.enabled, Boolean(response.paused), platform);
     } catch (error) {
       pauseBtn.disabled = false;
@@ -138,7 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     toggleBtn.addEventListener('click', handleToggle);
     pauseBtn.addEventListener('click', handlePause);
-    settingsBtn.addEventListener('click', openSettings);
     settingsLink.addEventListener('click', (e) => { e.preventDefault(); openSettings(); });
   };
 
@@ -162,20 +171,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const initSpeed = () => {
     let saveTimeout = null;
-
     const render = (value) => {
       const v = clamp(value, VIDEO.MIN_PLAYBACK_SPEED, VIDEO.MAX_PLAYBACK_SPEED);
       speedSlider.value = v;
-      speedInput.value = v.toFixed(1);
+      speedVal.textContent = `${v.toFixed(1)}×`;
     };
-
-    const onChange = async (e) => {
-      const raw = Number(e.target.value);
-      if (!Number.isFinite(raw)) {
-        const result = await chrome.storage.local.get({ playbackSpeed: VIDEO.DEFAULT_PLAYBACK_SPEED }).catch(() => ({}));
-        return render(result.playbackSpeed ?? VIDEO.DEFAULT_PLAYBACK_SPEED);
-      }
-      const speed = clamp(raw, VIDEO.MIN_PLAYBACK_SPEED, VIDEO.MAX_PLAYBACK_SPEED);
+    speedSlider.addEventListener('input', (e) => {
+      const speed = clamp(Number(e.target.value), VIDEO.MIN_PLAYBACK_SPEED, VIDEO.MAX_PLAYBACK_SPEED);
       render(speed);
       clearTimeout(saveTimeout);
       saveTimeout = setTimeout(async () => {
@@ -184,43 +186,9 @@ document.addEventListener('DOMContentLoaded', () => {
           broadcastSettingChange('playbackSpeed', speed);
         } catch (_) {}
       }, TIMING.SPEED_CHANGE_DEBOUNCE);
-    };
-
+    });
     chrome.storage.local.get({ playbackSpeed: VIDEO.DEFAULT_PLAYBACK_SPEED })
       .then((r) => render(r.playbackSpeed)).catch(() => render(VIDEO.DEFAULT_PLAYBACK_SPEED));
-
-    speedSlider.addEventListener('input', onChange);
-    speedInput.addEventListener('change', onChange);
-  };
-
-  const setTheme = (theme) => {
-    document.documentElement.setAttribute('data-theme', theme);
-    themeToggle.innerHTML = theme === 'dark' ? ICON_SUN : ICON_MOON;
-    const next = theme === 'dark' ? 'light' : 'dark';
-    themeToggle.title = `Switch to ${next} mode`;
-    themeToggle.setAttribute('aria-label', `Switch to ${next} mode`);
-  };
-
-  const resolveTheme = (pref) =>
-    pref === 'auto' || pref === 'system'
-      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-      : pref;
-
-  const initTheme = async () => {
-    try {
-      const result = await chrome.storage.local.get(['themePreference']);
-      setTheme(resolveTheme(result.themePreference || 'auto'));
-    } catch (_) {
-      setTheme(resolveTheme('auto'));
-    }
-    themeToggle.addEventListener('click', async () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      const next = current === 'dark' ? 'light' : 'dark';
-      try {
-        await chrome.storage.local.set({ themePreference: next });
-      } catch (_) {}
-      setTheme(next);
-    });
   };
 
   const initQuickLinks = () => {
@@ -233,7 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
     versionText.textContent = `v${chrome.runtime.getManifest().version}`;
   } catch (_) {}
 
-  initTheme();
   initPopup();
   initAutoEnable();
   initSpeed();

@@ -1,6 +1,6 @@
 {
   "name": "reels-autoscroller",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Reels AutoScroller — Manifest V3 hands-free auto-scroll for Instagram Reels, YouTube Shorts, TikTok, and Facebook Reels",
   "private": true,
   "scripts": {

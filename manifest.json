@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Reels AutoScroller",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Hands-free auto-scroll through Instagram Reels, YouTube Shorts, TikTok, and Facebook Reels. 100% local, no tracking.",
   "permissions": ["storage", "tabs"],
   "host_permissions": [

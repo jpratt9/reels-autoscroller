@@ -350,7 +350,7 @@ class UI {
   updateProgress(video) {
     const ratio = video.currentTime / video.duration;
     this.el.progressFill.style.transform = `scaleX(${ratio})`;
-    this.el.progressThumb.style.transform = `translateX(${ratio * 100}%)`;
+    this.el.progressThumb.style.left = `${ratio * 100}%`; // centred via CSS translate(-50%)
   }
 
   showSpeedToast(speed) {
