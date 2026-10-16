@@ -6,9 +6,8 @@
 
 </div>
 
-<!-- TODO: update the href with the published listing URL after the first Chrome Web Store release -->
 <p align="center">
-  <a href="https://chromewebstore.google.com/"><img src="https://developer.chrome.com/static/docs/webstore/branding/image/iNEddTyWiMfLSwFD6qGq.png" width="206" alt="Available in the Chrome Web Store"></a>
+  <a href="https://chromewebstore.google.com/detail/reels-autoscroller/empkmklhflgcchkaddgonanmlnmjkihc"><img src="https://developer.chrome.com/static/docs/webstore/branding/image/iNEddTyWiMfLSwFD6qGq.png" width="206" alt="Available in the Chrome Web Store"></a>
 </p>
 
 <p align="center">
