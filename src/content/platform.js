@@ -100,6 +100,35 @@ class Platform {
     return this.getBestVideoCandidate(active) || this.getBestVideoCandidate(all);
   }
 
+  // Free the decoded frames and buffered media of clips we've already scrolled
+  // well past. Infinite feeds leave every watched <video> in the DOM with its
+  // buffers intact, so without this the tab's memory grows without bound as the
+  // feed advances. Only touches connected, non-current videos at least 1.5
+  // viewports above the fold — never the current clip or anything on/approaching
+  // screen — so a downward auto-scroll never drops a video it's about to play.
+  // The site re-fetches the source if the user ever scrolls back up to it.
+  releaseStaleVideos(currentVideo = null) {
+    const vh = window.innerHeight || 0;
+    if (!vh) return;
+    for (const video of document.querySelectorAll('video')) {
+      if (video === currentVideo) continue;
+      if (!video.src && !video.currentSrc && !video.srcObject) continue; // already released
+      let rect;
+      try {
+        rect = video.getBoundingClientRect();
+      } catch (_) {
+        continue;
+      }
+      if (rect.bottom >= -vh * 1.5) continue; // still on screen or just above — leave it
+      try {
+        video.pause();
+        video.removeAttribute('src');
+        if (video.srcObject) video.srcObject = null;
+        video.load(); // aborts the media and releases its buffered data
+      } catch (_) {}
+    }
+  }
+
   // --- advancing the feed --------------------------------------------------
 
   scroll(currentVideo = null, canExecute = null) {

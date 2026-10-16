@@ -586,6 +586,9 @@
       setTimeout(() => {
         this.state.isScrolling = false;
         if (this.state.isEnabled && !this.state.isPaused) this.findAndWatchCurrentVideo();
+        // Drop the buffered media of clips we've scrolled past, so an endless
+        // feed doesn't grow the tab's memory without bound.
+        this.platform.releaseStaleVideos(this.state.currentVideo);
       }, TIMING.SCROLL_ANIMATION_DURATION);
     }
 
